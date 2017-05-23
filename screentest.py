@@ -19,20 +19,21 @@ def display(image):
   plt.show()
 
 screenshots = []
-num_screens = 20
+num_screens = 50
 
 start_time = time.time()
 for i in range(num_screens):
-  img = get_screen((100,100,600,600), i)
+  img = get_screen((2*267,2*289,2*567,2*589), i)
   array = np.array(img)
-  array = array / np.max(array)
+#  array = array / np.max(array)
   screenshots.append(array)
 
 end_time = time.time()
 print("Time for {} screens: {}".format(num_screens, end_time - start_time))
 print("Screens per second: {}".format(num_screens / (end_time - start_time)))
 
-plt.imshow(array, cmap='gray')
-plt.show()
+for i in range(len(screenshots)):
+  plt.imshow(screenshots[i], cmap='gray')
+  plt.show()
 
 
