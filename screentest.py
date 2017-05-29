@@ -42,3 +42,14 @@ for i in range(len(screenshots)):
   plt.show()
 
 
+
+default_box = (2*147,2*177,2*627,2*627)
+
+def take_screenshot(box=(2*147,2*177,2*627,2*627)):
+  img = ImageGrab.grab(box)
+  img = img.convert("L")
+  array = np.array(img)
+  array = scipy.misc.imresize(array, (84, 90), interp='nearest')
+  array = array[:, 0:84]
+  array = array / np.max(array)
+  return array
