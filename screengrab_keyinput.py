@@ -18,44 +18,28 @@ for i in range(0, 20):
 ## an example of how to open nestopia, make mario jump
 ## I have a binded to q, b binded to w
 ## up, left, down, right binded to i j k l respectively
-import os
-import time
-
-cmd1 = """osascript -e 'tell application "Nestopia"
-    activate
-    tell application "System Events" to keystroke "a"
-end tell'
-"""
-
-start_time = time.time()
-while True:
-    os.system(cmd1)
-    if time.time() - start_time > 5:
-        break
-
-
 import time
 import os
 import pykeyboard
 import numpy as np
 
-cmd = """
-osascript -e 'tell application "Nestopia"
-    activate
-end tell'
-"""
 
-os.system(cmd)
+def init():
+    cmd = """
+    osascript -e 'tell application \"Nestopia\" to open file \"Users:jackliang 1:Desktop:SMB.nes\"
+    '
+    """
 
-time.sleep(.1)
+    time.sleep(.02)
 
-k = pykeyboard.PyKeyboard()
-k.press_key('q')
-time.sleep(.5)
-k.release_key('q')
+    os.system(cmd)
+    cmd = """
+    osascript -e 'tell application "Nestopia"
+        activate
+    end tell'
+    """
 
-
-
+    os.system(cmd)
 
 def input_command(keys, sleep_time, lag_param):
     cmd = """
@@ -77,12 +61,41 @@ def input_command(keys, sleep_time, lag_param):
     for key in keys:
         k.release_key(key)
 
+def load_state(filename):
+    init()
 
-test = ['a', 'l']
+    cmd = """
+    osascript -e 'tell application "System Events" to keystroke "d" using command down'
+    """
+    os.system(cmd)
+
+    k = pykeyboard.PyKeyboard()
+    for key in list(filename)[:5]:
+        k.tap_key(key)
+
+    cmd = """
+    osascript -e 'tell application "System Events" to key code 36'
+    """
+    os.system(cmd)
+
+
+
+
+
+
+
+
+
+test = ['q', 'l']
 input_command(['z'], .1, 0.01)
 
 
-time.sleep(0.5)
-input_command(test,10 ,0.01)
+load_state('12345.frz')
+time.sleep(3)
+input_command(test,3 ,0.01)
+input_command(test,3 ,0.01)
+
+
+
 
 
