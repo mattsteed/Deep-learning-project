@@ -82,8 +82,5 @@ def create_network(TrainX, TrainY, TestX, TestY, \
 
 
 def main():
-
-
-
-if __name__=='__main__':
-  main()
+  if __name__=='__main__':
+    main()
