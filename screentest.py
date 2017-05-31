@@ -5,6 +5,7 @@ from PIL import ImageGrab, Image
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import scipy.misc
 
 
 def get_screen(box, i):
@@ -19,13 +20,17 @@ def display(image):
   plt.show()
 
 screenshots = []
-num_screens = 50
+num_screens = 20
 
 start_time = time.time()
 for i in range(num_screens):
-  img = get_screen((2*267,2*289,2*567,2*589), i)
+  img = get_screen((2*147,2*177,2*627,2*627), i)
   array = np.array(img)
-#  array = array / np.max(array)
+  print(array.shape)
+  array = scipy.misc.imresize(array, (84, 90), interp='nearest')
+  array = array[:, 0:84]
+  print(array.shape)
+  array = array / np.max(array)
   screenshots.append(array)
 
 end_time = time.time()
@@ -37,3 +42,14 @@ for i in range(len(screenshots)):
   plt.show()
 
 
+
+default_box = (2*147,2*177,2*627,2*627)
+
+def take_screenshot(box=(2*147,2*177,2*627,2*627)):
+  img = ImageGrab.grab(box)
+  img = img.convert("L")
+  array = np.array(img)
+  array = scipy.misc.imresize(array, (84, 90), interp='nearest')
+  array = array[:, 0:84]
+  array = array / np.max(array)
+  return array

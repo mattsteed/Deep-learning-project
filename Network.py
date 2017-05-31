@@ -23,18 +23,18 @@ def conv2d(x, W, stride):
 def create_network(TrainX, TrainY, TestX, TestY, \
              epochs=10, batch_size=50, learning_rate=0.001):
 
-  image_dim = 28
-  seq_len = 1
-#  x_img = tf.placeholder(tf.float32, shape=[None, image_dim, image_dim, seq_len])
-  x_img = tf.placeholder(tf.float32, shape=[None, 784])
+  image_dim = 84
+  seq_len = 4
+  x_img = tf.placeholder(tf.float32, shape=[None, image_dim, image_dim, seq_len])
+#  x_img = tf.placeholder(tf.float32, shape=[None, 784])
   y_ = tf.placeholder(tf.float32, shape=[None, 10])
-  x_img2 = tf.reshape(x_img, [-1, 28, 28, 1])
+#  x_img2 = tf.reshape(x_img, [-1, 28, 28, 1])
 
 
   W_conv1 = weight_variable([8,8,1,16])
   b_conv1 = bias_variable([16])
 
-  h_conv1 = tf.nn.relu(conv2d(x_img2, W_conv1, 4) + b_conv1)
+  h_conv1 = tf.nn.relu(conv2d(x_img, W_conv1, 4) + b_conv1)
 
   W_conv2 = weight_variable([4,4,16,32])
   b_conv2 = bias_variable([32])
