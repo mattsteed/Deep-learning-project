@@ -139,7 +139,7 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma = 0.5
 
 
       # insert this instance into screenshots array at index start_idx+1
-
+      screenshots.insert(start_idx+1, new_state)
 
 
 
