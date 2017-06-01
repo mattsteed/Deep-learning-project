@@ -113,7 +113,10 @@ input_command(['z'], .1, 0.01)
 
 
 load_state('12345.frz')
+
+init()
 time.sleep(3)
+
 input_command(test,3 ,0.01)
 input_command(test,3 ,0.01)
 
