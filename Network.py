@@ -8,8 +8,6 @@ import screentest
 import screengrab_keyinput as sck
 from copy import copy
 
-
-
 class SC:
   def __init__(screenshot=None, save_state=None):
     self.screenshot = screenshot # 84x84 numpy array in grayscale
@@ -23,6 +21,19 @@ class SC:
 
 keys = {0:'q', 1:'w', 2:'j', 3:'i', 4:'k', 5:'l'}
 
+
+from scipy import misc
+r = misc.imread('reward.png', mode = 'L')
+rwd = np.array(r)
+rwd = scipy.misc.imresize(rwd, (84, 90), interp='nearest')
+rwd = rwd[:, 0:84]
+rwd = rwd / np.max(rwd)
+
+f = misc.imread('failure.png', mode = 'L')
+fail = np.array(f)
+fail = scipy.misc.imresize(fail, (84, 90), interp='nearest')
+fail = fail[:, 0:84]
+fail = fail / np.max(fail)
 
 
 
@@ -135,6 +146,11 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma = 0.5
       # Get reward if there should be a reward at this instance, store in 
       # reward_check variable
 
+      reward_check = 0
+      if np.linalg.norm(new_state.get_screenshot() - fail, 'fro') < 5.0: ## possibly tune these parameters
+        reward_check = -1
+      elif np.linalg.norm(new_state.get_screenshot() - rwd, 'fro') < 5.0:
+        reward_check = 1
 
       right_bias = 0.1
 

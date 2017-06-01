@@ -53,3 +53,12 @@ def take_screenshot(box=(2*147,2*177,2*627,2*627)):
   array = array[:, 0:84]
   array = array / np.max(array)
   return array
+
+
+
+from scipy import misc
+r = misc.imread('test2.png', mode = 'L')
+test = np.array(r)
+test = scipy.misc.imresize(test, (84, 90), interp='nearest')
+test = test[:, 0:84]
+test = test / np.max(test)
