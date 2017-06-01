@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import screentest
 import screengrab_keyinput as sck
+from copy import copy
 
 
 
@@ -103,6 +104,7 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma = 0.5
       x[0,:,:,3] = screenshots[start_idx].get_screenshot()
 
       move = sess.run([y_out], feed_dict={x_img:x})
+      label = copy(move).reshape(1, 6)
       two_hot = np.zeros(6)
       two_hot[np.argmax(move[0:2])] = 1
       two_hot[np.argmax(move[2:6] + 2)] = 1
@@ -134,11 +136,14 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma = 0.5
       # reward_check variable
 
 
-      right_bias = 0.5
+      right_bias = 0.1
 
       if (reward_check == -1 or reward_check == 1):
         label = reward_check * two_hot.reshape(1, 6)
-        label[0][5] += right_bias
+        label[0][move_1] = reward_check
+        label[0][move_2] = reward_check
+        if (move_2 == 5):
+          label[0][5] += right_bias
         train_step.run(feed_dict={x_img:x, y_:label}
 
       else: 
@@ -147,9 +152,11 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma = 0.5
         x_bar[0,:,:,1] = screenshots[start_idx-1].get_screenshot()
         x_bar[0,:,:,2] = screenshots[start_idx].get_screenshot()
         x_bar[0,:,:,3] = screenshots[start_idx+1].get_screenshot()
-        label = sess.run([y_out], feed_dict={x_img:x_bar})
-        label = label.reshape(1, 6)
-        label[0][5] += right_bias
+        new_label = sess.run([y_out], feed_dict={x_img:x_bar}).reshape(1,6)
+        label[0][move_1] = gamma * new_label[0][move_1]
+        label[0][move_2] = gamma * new_label[0][move_2]
+        if (move_2 == 5):
+          label[0][5] += right_bias
         train_step.run(feed_dict={x_img:x, y_:label}
 
 
