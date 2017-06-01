@@ -132,8 +132,5 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma = 0.5
 
 
 def main():
-
-
-
-if __name__=='__main__':
-  main()
+  if __name__=='__main__':
+    main()
