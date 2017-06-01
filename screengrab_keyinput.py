@@ -78,6 +78,28 @@ def load_state(filename):
     """
     os.system(cmd)
 
+def save_state(filename):
+    cmd = """
+    osascript -e 'tell application "Nestopia"
+        activate
+    end tell'
+    """
+
+    os.system(cmd)
+
+    cmd = """
+    osascript -e 'tell application "System Events" to keystroke "f" using command down'
+    """
+    os.system(cmd)
+
+    k = pykeyboard.PyKeyboard()
+    for key in list(filename):
+        k.tap_key(key)
+
+    cmd = """
+    osascript -e 'tell application "System Events" to key code 36'
+    """
+    os.system(cmd)
 
 
 

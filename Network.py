@@ -4,6 +4,8 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+import screentest
+import screengrab_keyinput as sck
 
 
 
@@ -17,6 +19,8 @@ class SC:
 
   def get_save_state(self):
     return self.save_state
+
+keys = {0:'q', 1:'w', 2:'j', 3:'i', 4:'k', 5:'l'}
 
 
 
@@ -102,12 +106,32 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma = 0.5
       two_hot = np.zeros(6)
       two_hot[np.argmax(move[0:2])] = 1
       two_hot[np.argmax(move[2:6] + 2)] = 1
+
       # make move in game using two_hot
+
+      move_1 = np.argmax(move[0:2])
+      move_2 = np.argmax(move[2:6] + 2)
+      moves = [keys[move_1], keys[move_2]]
+
+      sck.input_command(moves, 1./2.5, 0.01)
+
       # take screenshot and save state, save to new class instance
+      new_state = SC()
+      new_sc = screentest.take_screenshot() # argument should be (x, y, x', y')
+      new_save = sck.save_state("{:05d}save".format(i) + '.frz')
+
+
+
+
       # insert this instance into screenshots array at index start_idx+1
+
+
+
 
       # Get reward if there should be a reward at this instance, store in 
       # reward_check variable
+
+
       right_bias = 0.5
 
       if (reward_check == -1 or reward_check == 1):
