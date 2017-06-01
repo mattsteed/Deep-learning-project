@@ -4,7 +4,7 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
-import screentest
+from screentest import take_screenshot
 import screengrab_keyinput as sck
 from copy import copy
 
@@ -131,7 +131,7 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma = 0.5
       # take screenshot and save state, save to new class instance
       new_state = SC()
       new_sc = screentest.take_screenshot() # argument should be (x, y, x', y')
-      f_name = "{:05d}".format(31)[::-1] + "save.frz"
+      f_name = "{:05d}".format(i)[::-1] + "save.frz"
       #new_save = sck.save_state("{:05d}save".format(i) + '.frz')
       new_save = sck.save_state(f_name)
 
@@ -173,13 +173,140 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma = 0.5
         label[0][move_2] = gamma * new_label[0][move_2]
         if (move_2 == 5):
           label[0][5] += right_bias
-        train_step.run(feed_dict={x_img:x, y_:label}
+        train_step.run(feed_dict={x_img:x, y_:label})
 
+  # Now play the game
+  # Load a state near the beginning and seed the screenshots
 
-
+  # run through array and take screenshot and savestate
+  # append to new array
+  # make move
 
 
 
 def main():
-  if __name__=='__main__':
+  # Load seed screenshots and states
+
+  #Train!!!
+  create_network(screenshots)
+
+if __name__=='__main__':
     main()
+
+
+
+def take_screenshot(box=(2*147,2*177,2*627,2*627)):
+  img = ImageGrab.grab(box)
+  img = img.convert("L")
+  array = np.array(img)
+  array = scipy.misc.imresize(array, (84, 90), interp='nearest')
+  array = array[:, 0:84]
+  array = array / np.max(array)
+  return array
+
+def init():
+    cmd = """
+    osascript -e 'tell application \"Nestopia\" to open file \"Users:jackliang 1:Desktop:SMB.nes\"
+    '
+    """
+
+    time.sleep(.02)
+
+    os.system(cmd)
+    cmd = """
+    osascript -e 'tell application "Nestopia"
+        activate
+    end tell'
+    """
+
+    os.system(cmd)
+
+def input_command(keys, sleep_time, lag_param):
+    cmd = """
+    osascript -e 'tell application "Nestopia"
+        activate
+    end tell'
+    """
+
+    os.system(cmd)
+
+    time.sleep(lag_param)
+
+    k = pykeyboard.PyKeyboard()
+    for key in keys:
+        k.press_key(key)
+
+    time.sleep(sleep_time)
+
+    for key in keys:
+        k.release_key(key)
+
+def load_state(filename):
+    init()
+
+    cmd = """
+    osascript -e 'tell application "System Events" to keystroke "d" using command down'
+    """
+    os.system(cmd)
+
+    k = pykeyboard.PyKeyboard()
+    for key in list(filename)[:5]:
+        k.tap_key(key)
+
+    cmd = """
+    osascript -e 'tell application "System Events" to key code 36'
+    """
+    os.system(cmd)
+
+def save_state(filename):
+    cmd = """
+    osascript -e 'tell application "Nestopia"
+        activate
+    end tell'
+    """
+
+    os.system(cmd)
+
+    cmd = """
+    osascript -e 'tell application "System Events" to keystroke "f" using command down'
+    """
+    os.system(cmd)
+
+    k = pykeyboard.PyKeyboard()
+    for key in list(filename):
+        k.tap_key(key)
+
+    cmd = """
+    osascript -e 'tell application "System Events" to key code 36'
+    """
+    os.system(cmd)
+
+time.sleep(1)
+arr = take_screenshot(box= (308*2,60*2, 2*1130, 2*838))
+
+
+def init():
+    cmd = """
+    osascript -e 'tell application \"Nestopia\" to open file \"Users:jackliang 1:Desktop:SMB.nes\"
+    '
+    """
+
+    time.sleep(.02)
+
+    os.system(cmd)
+    cmd = """
+    osascript -e 'tell application "Nestopia"
+        activate
+    end tell'
+    """
+
+    os.system(cmd)
+import time
+init()
+
+for i in range(0,20):
+  time.sleep(4)
+  filename = "sd" + "{:05d}".format(i)[::-1] + ".frz"
+  save_state(filename)
+
+  arr = take_screenshot(box=(308*2,60*2, 2*1130, 2*838))
