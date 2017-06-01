@@ -118,7 +118,9 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma = 0.5
       # take screenshot and save state, save to new class instance
       new_state = SC()
       new_sc = screentest.take_screenshot() # argument should be (x, y, x', y')
-      new_save = sck.save_state("{:05d}save".format(i) + '.frz')
+      f_name = "{:05d}".format(31)[::-1] + "save.frz"
+      #new_save = sck.save_state("{:05d}save".format(i) + '.frz')
+      new_save = sck.save_state(f_name)
 
 
 
