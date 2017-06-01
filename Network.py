@@ -208,9 +208,6 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma=0.5):
             start_idx = np.random.randint(0, high=num_screens)
             x = np.zeros((1, 84, 84, 1))
             x[0, :, :, 0] = screenshots[start_idx].get_screenshot()
-            #x[0, :, :, 1] = screenshots[start_idx - 2].get_screenshot()
-            #x[0, :, :, 2] = screenshots[start_idx - 1].get_screenshot()
-            #x[0, :, :, 3] = screenshots[start_idx].get_screenshot()
 
             move = sess.run([y_out], feed_dict={x_img: x})
             #print(move)
@@ -254,9 +251,7 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma=0.5):
             # reward_check variable
 
             reward_check = 0
-            #print("#######################Here####################")
-            #print(fail.shape)
-            #print(new_state.get_screenshot().shape)
+
             if np.linalg.norm(new_state.get_screenshot() - fail, 'fro') < 5.0:  ## possibly tune these parameters
                 reward_check = -1
             elif np.linalg.norm(new_state.get_screenshot() - rwd, 'fro') < 5.0:
@@ -274,23 +269,13 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma=0.5):
             else:
                 x_bar = np.zeros((1, 84, 84, 1))
                 x_bar[0, :, :, 0] = screenshots[start_idx - 2].get_screenshot()
-                #x_bar[0, :, :, 1] = screenshots[start_idx - 1].get_screenshot()
-                #x_bar[0, :, :, 2] = screenshots[start_idx].get_screenshot()
-                #x_bar[0, :, :, 3] = screenshots[start_idx + 1].get_screenshot()
+
                 new_label = sess.run([y_out], feed_dict={x_img: x_bar})[0].reshape(1, 6)
                 label[0][move_1] = gamma * new_label[0][move_1]
                 label[0][move_2] = gamma * new_label[0][move_2]
                 if (move_2 == 5):
                     label[0][5] += right_bias
                 train_step.run(feed_dict={x_img: x, y_: label})
-
-    # Now play the game
-    # Load a state near the beginning and seed the screenshots
-
-    # run through array and take screenshot and savestate
-    # append to new array
-    # make move
-
 
 def main():
     # Load seed screenshots and states
