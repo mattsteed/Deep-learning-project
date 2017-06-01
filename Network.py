@@ -148,7 +148,7 @@ def conv2d(x, W, stride):
 
 def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma=0.5):
     image_dim = 84
-    seq_len = 4
+    seq_len = 1
     x_img = tf.placeholder(tf.float32, shape=[None, image_dim, image_dim, seq_len])
     #  x_img = tf.placeholder(tf.float32, shape=[None, 784])
     y_ = tf.placeholder(tf.float32, shape=[None, 6])
@@ -201,35 +201,46 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma=0.5):
     # Training step
     # INSERT Q LEARNING CODE OR FUNCTION HERE
     with tf.Session() as sess:
-        for i in range(num_steps):
+        init = tf.global_variables_initializer()
+        sess.run(init)
+        for i in range(20, num_steps):
             num_screens = len(screenshots)
-            start_idx = np.random.randint(3, high=num_screens)
-            x = np.zeros((1, 84, 84, 4))
-            x[0, :, :, 0] = screenshots[start_idx - 3].get_screenshot()
-            x[0, :, :, 1] = screenshots[start_idx - 2].get_screenshot()
-            x[0, :, :, 2] = screenshots[start_idx - 1].get_screenshot()
-            x[0, :, :, 3] = screenshots[start_idx].get_screenshot()
+            start_idx = np.random.randint(0, high=num_screens)
+            x = np.zeros((1, 84, 84, 1))
+            x[0, :, :, 0] = screenshots[start_idx].get_screenshot()
+            #x[0, :, :, 1] = screenshots[start_idx - 2].get_screenshot()
+            #x[0, :, :, 2] = screenshots[start_idx - 1].get_screenshot()
+            #x[0, :, :, 3] = screenshots[start_idx].get_screenshot()
 
             move = sess.run([y_out], feed_dict={x_img: x})
-            label = copy(move).reshape(1, 6)
+            #print(move)
+            #print(move[0])
+            label = copy(move[0]).reshape(1, 6)
             two_hot = np.zeros(6)
-            two_hot[np.argmax(move[0:2])] = 1
-            two_hot[np.argmax(move[2:6] + 2)] = 1
+            two_hot[np.argmax(move[0][0][0:2])] = 1
+            two_hot[np.argmax(move[0][0][2:6]) + 2] = 1
 
             # make move in game using two_hot
 
-            move_1 = np.argmax(move[0:2])
-            move_2 = np.argmax(move[2:6] + 2)
+            move_1 = np.argmax(move[0][0][0:2])
+            move_2 = np.argmax(move[0][0][2:6]) + 2
             moves = [keys[move_1], keys[move_2]]
 
+            f_name = screenshots[start_idx].get_save_state()
+            #print("File name !!!!!!!!!!!!!!!!!!!!")
+            #print(f_name)
+            load_state(f_name)
+            time.sleep(0.01)
             input_command(moves, 1. / 2.5, 0.01)
 
             # take screenshot and save state, save to new class instance
-            new_state = SC()
-            new_sc = take_screenshot()  # argument should be (x, y, x', y')
             f_name = "{:05d}".format(i)[::-1] + "save.frz"
+            new_sc = take_screenshot()  # argument should be (x, y, x', y')
+            save_state(f_name)
+
             # new_save = sck.save_state("{:05d}save".format(i) + '.frz')
-            new_save = save_state(f_name)
+            new_state = SC(new_sc, f_name)
+
 
 
 
@@ -243,6 +254,9 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma=0.5):
             # reward_check variable
 
             reward_check = 0
+            #print("#######################Here####################")
+            #print(fail.shape)
+            #print(new_state.get_screenshot().shape)
             if np.linalg.norm(new_state.get_screenshot() - fail, 'fro') < 5.0:  ## possibly tune these parameters
                 reward_check = -1
             elif np.linalg.norm(new_state.get_screenshot() - rwd, 'fro') < 5.0:
@@ -258,12 +272,12 @@ def create_network(screenshots, num_steps=1000, learning_rate=0.001, gamma=0.5):
                     label[0][5] += right_bias
                 train_step.run(feed_dict={x_img: x, y_: label})
             else:
-                x_bar = np.zeros((1, 84, 84, 4))
+                x_bar = np.zeros((1, 84, 84, 1))
                 x_bar[0, :, :, 0] = screenshots[start_idx - 2].get_screenshot()
-                x_bar[0, :, :, 1] = screenshots[start_idx - 1].get_screenshot()
-                x_bar[0, :, :, 2] = screenshots[start_idx].get_screenshot()
-                x_bar[0, :, :, 3] = screenshots[start_idx + 1].get_screenshot()
-                new_label = sess.run([y_out], feed_dict={x_img: x_bar}).reshape(1, 6)
+                #x_bar[0, :, :, 1] = screenshots[start_idx - 1].get_screenshot()
+                #x_bar[0, :, :, 2] = screenshots[start_idx].get_screenshot()
+                #x_bar[0, :, :, 3] = screenshots[start_idx + 1].get_screenshot()
+                new_label = sess.run([y_out], feed_dict={x_img: x_bar})[0].reshape(1, 6)
                 label[0][move_1] = gamma * new_label[0][move_1]
                 label[0][move_2] = gamma * new_label[0][move_2]
                 if (move_2 == 5):
@@ -286,7 +300,7 @@ def main():
         filename = "sd" + "{:05d}".format(i)[::-1]
 
         newstate.screenshot = scipy.misc.imread(filename + '.png', mode='L')
-        newstate.save_state = '~/Desktop/' + filename + '.frz'
+        newstate.save_state = filename + '.frz'
 
         arr.append(newstate)
     # Train!!!
